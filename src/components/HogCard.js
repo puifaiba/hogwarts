@@ -1,8 +1,6 @@
 import React, {Component} from "react"
 import hogs from "../porkers_data"
-
-// const StudentCard = ({ wizard }) => {
-//     const { name, image, house, points } = wizard
+import {Card, Icon, Image} from "semantic-ui-css"
 
 export default class HogCard extends Component {
   state = {
@@ -24,7 +22,7 @@ export default class HogCard extends Component {
   render() {
     const {name, specialty, greased, weight} = this.props.hog
     return (
-      <div onClick={this.changeShowDetail} className="pigTile">
+      <card onClick={this.changeShowDetail} className="pigTile">
         <h3>{name}</h3>
         <img src={this.pigImage()} />
         {this.state.showDetail ? (
@@ -35,7 +33,7 @@ export default class HogCard extends Component {
             <li>Highest Medal: {this.props.hog["highest medal achieved"]}</li>
           </ul>
         ) : null}
-      </div>
+      </card>
     )
   }
 }

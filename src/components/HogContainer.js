@@ -4,8 +4,59 @@ import HogCard from "./HogCard"
 export default class HogContainer extends Component {
   state = {
     showGreased: true,
-    sortName: false,
-    sortWeight: false,
+    sortType: "none",
+  }
+
+  // gets list of hogs from props, then calls sort and filter functions to transform list.
+  //Finally returns final list to render cards
+  generateHogList = () => {
+    console.log("generate Hog List")
+    let hogList = this.props.hogs.map((hog) => hog)
+    hogList = this.sortHogList(hogList)
+    if (this.state.showGreased) {
+      return hogList
+    }
+    return hogList.filter((hog) => hog.greased)
+  }
+
+  //logic to determine what key to apply sort to.
+  //If sortType === "none" will return unalterd list
+  sortHogList = (listToSort) => {
+    if (this.state.sortType === "name") {
+      return this.sortFunction(listToSort, "name")
+    } else if (this.state.sortType === "weight") {
+      return this.sortFunction(listToSort, "weight")
+    } else {
+      return listToSort
+    }
+  }
+
+  //abstracted sort function returns sorted list based on supllied key
+  sortFunction = (listToSort, key) => {
+    console.log("inside SortFunction")
+    listToSort.sort((a, b) => {
+      const itemA = a[key]
+      const itemB = b[key]
+      if (itemA < itemB) {
+        return -1
+      }
+      if (itemA > itemB) {
+        return 1
+      }
+      return 0
+    })
+    return listToSort
+  }
+
+  // changes method to sort on.
+  changeSort = ({target}) => {
+    let sortKey = target.id
+    if (sortKey === this.state.sortType) {
+      sortKey = "none"
+    }
+    this.setState({
+      sortType: sortKey,
+    })
   }
 
   toggleGreasedFilter = () => {
@@ -14,77 +65,44 @@ export default class HogContainer extends Component {
     })
   }
 
-  toggleNameSort = () => {
-    this.setState({
-      sortName: !this.state.sortName,
-    })
-  }
-
-  toggleWeightSort = () => {
-    this.setState({
-      sortWeight: !this.state.sortWeight,
-    })
-  }
-
-  sortHogList = () => {
-    let sortedHogs = []
-
-    //Sort By Name
-    if (this.state.sortName) {
-      const hogs = this.props.hogs.map((hog) => hog)
-      console.log(hogs)
-      sortedHogs = hogs.sort((a, b) => {
-        const nameA = a.name.toUpperCase()
-        const nameB = b.name.toUpperCase()
-        if (nameA < nameB) {
-          return -1
-        }
-        if (nameA > nameB) {
-          return 1
-        }
-        return 0
-      })
-    } else {
-      //   console.log(this.props.hogs)
-      sortedHogs = this.props.hogs
-    }
-
-    //Sort By Weight
-    if (this.state.sortWeight) {
-      sortedHogs = this.props.hogs.sort((a, b) => {
-        const weightA = a.weight
-        const weightB = b.weight
-        if (weightA < weightB) {
-          return -1
-        }
-        if (weightA > weightB) {
-          return 1
-        }
-        return 0
-      })
-    } else {
-      sortedHogs = this.props.hogs
-    }
-
-    //return sorted array to generateHogList
-    return sortedHogs
-  }
-
-  generateHogList = () => {
-    let hogList = this.sortHogList()
-    if (this.state.showGreased) {
-      return hogList
-    }
-    return hogList.filter((hog) => hog.greased)
-  }
-
   render() {
     return (
       <div className="indexWrapper">
         <h1>Hello Hogs</h1>
-        <button onClick={this.toggleGreasedFilter}>Greased Filter</button>
-        <button onClick={this.toggleNameSort}>Sort by Name</button>
-        <button onClick={this.toggleWeightSort}>Sort by Weight</button>
+        <button
+          onClick={this.toggleGreasedFilter}
+          id="greased"
+          className={
+            !this.state.showGreased ? "ui positive button" : "ui button"
+          }
+        >
+          Greased Filter
+        </button>
+        <div className="ui buttons">
+          <button
+            onClick={this.changeSort}
+            id="name"
+            className={
+              this.state.sortType === "name"
+                ? "ui positive button"
+                : "ui button"
+            }
+          >
+            Sort by Name
+          </button>
+          <div className="or"></div>
+          <button
+            onClick={this.changeSort}
+            id="weight"
+            className={
+              this.state.sortType === "weight"
+                ? "ui positive button"
+                : "ui button"
+            }
+          >
+            Sort by Weight
+          </button>
+        </div>
         {this.generateHogList().map((hog) => (
           <HogCard hog={hog} />
         ))}
